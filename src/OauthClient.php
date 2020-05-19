@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 class OauthClient
 {
     protected $currentProfile = 'default';
+    protected $cacheDurationSubtraction = 10; // seconds
 //    protected $profiles;
 
     public function __construct()
@@ -89,7 +90,11 @@ class OauthClient
 
         $body = json_decode((string) $response->getBody());
 
-        cache()->put($this->cacheKey(), $body->access_token, now()->addSeconds($body->expires_in - 10));
+        cache()->put(
+            $this->cacheKey(),
+            $body->access_token,
+            now()->addSeconds($body->expires_in - $this->cacheDurationSubtraction)
+        );
 
         return cache()->get($this->cacheKey());
     }

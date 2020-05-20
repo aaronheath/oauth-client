@@ -1,5 +1,5 @@
 {
-  "name": "aaronheath/laravel-oauth-client",
+  "name": "aaronheath/oauth-client",
   "description": "A simple oauth client for use in my applications.",
   "license": "MIT",
   "keywords": ["laravel", "oauth"],

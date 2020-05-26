@@ -3,6 +3,7 @@
 namespace Heath\OauthClient;
 
 use GuzzleHttp\Client;
+use Illuminate\Support\Str;
 
 class OauthClient
 {
@@ -126,5 +127,15 @@ class OauthClient
 //        }
 //
 //        return $profile->first();
+    }
+
+    public function seedAccessToken()
+    {
+        cache()->forever(
+            $this->cacheKey(),
+            Str::random(16)
+        );
+
+        return $this;
     }
 }

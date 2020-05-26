@@ -287,4 +287,16 @@ class OauthClientTest extends Orchestra
             (string) $requests[0]['request']->getBody()
         );
     }
+
+    /**
+     * @test
+     */
+    public function seeds_access_token()
+    {
+        (new OauthClient)->seedAccessToken();
+
+        $token = cache()->get('oauth.default.access_token');
+
+        $this->assertEquals(16, strlen($token));
+    }
 }

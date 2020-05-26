@@ -159,63 +159,6 @@ class OauthClientTest extends Orchestra
         );
     }
 
-//    /**
-//     * @test
-//     */
-//    public function can_load_own_run_time_profile()
-//    {
-//        $url = 'https://api.example.com/oauth/token';
-//        $clientId = 'abc';
-//        $clientSecret = '123';
-//
-//        $requests = [];
-//
-//        $history = Middleware::history($requests);
-//
-//        $responses = new MockHandler([
-//            new Response(200, ['content-type' => 'application/json'], json_encode([
-//                'token_type' => 'Bearer',
-//                'expires_in' => 3000,
-//                'access_token' => 'run-time-token',
-//                'expires_at' => '2019-04-01T00:01:02.001Z',
-//            ])),
-//        ]);
-//
-//        $handler = HandlerStack::create($responses);
-//        $handler->push($history);
-//
-//        $client = new Client(['handler' => $handler]);
-//
-//        $this->app->instance(Client::class, $client);
-//
-//        $token = (new OauthClient)
-//            ->loadProfile([
-//                'name' => 'run-time-loaded',
-//                'url' => $url,
-//                'client_id' => $clientId,
-//                'client_secret' => $clientSecret,
-//                'verify_https' => false,
-//            ])
-//            ->useProfile('run-time-loaded')
-//            ->token();
-//
-//        $this->assertEquals('run-time-token' , $token);
-//        $this->assertEquals('run-time-token', cache()->get('oauth.run-time-loaded.access_token'));
-//
-//        $this->assertEquals('POST', $requests[0]['request']->getMethod());
-//        $this->assertEquals($url, $requests[0]['request']->getUri());
-//
-//        $this->assertEquals(
-//            json_encode([
-//                'grant_type' => 'client_credentials',
-//                'client_id' => $clientId,
-//                'client_secret' => $clientSecret,
-//                'scope' => '',
-//            ]),
-//            (string) $requests[0]['request']->getBody()
-//        );
-//    }
-
     /**
      * @test
      */
@@ -241,11 +184,6 @@ class OauthClientTest extends Orchestra
                 'c' => 3
             ],
         ];
-
-//        config([
-//            'site.changi.client_id' => 'abc123',
-//            'site.changi.client_secret' => 'xyz987',
-//        ]);
 
         config([
             'oauth-client.profiles.default.client_id' => 'abc123',

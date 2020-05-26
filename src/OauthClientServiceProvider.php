@@ -8,7 +8,7 @@ class OauthClientServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        
+        //
     }
 
     public function boot()

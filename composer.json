@@ -14,7 +14,8 @@
     "php": "^7.2.5",
     "illuminate/support": "~5.7.0",
     "guzzlehttp/guzzle": "~6.0",
-    "ext-json": "*"
+    "ext-json": "*",
+    "aaronheath/class-logger": "^0.0.1"
   },
   "autoload": {
     "psr-4": {
@@ -32,6 +33,13 @@
       "Tests\\": "tests/"
     }
   },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/aaronheath/class-logger"
+    }
+  ],
+
   "minimum-stability": "stable",
   "extra": {
     "laravel": {

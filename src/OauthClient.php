@@ -3,10 +3,13 @@
 namespace Heath\OauthClient;
 
 use GuzzleHttp\Client;
+use Heath\ClassLogger\ClassLogger;
 use Illuminate\Support\Str;
 
 class OauthClient
 {
+    use ClassLogger;
+
     protected $currentProfile = 'default';
     protected $cacheDurationSubtraction = 10; // seconds
 
@@ -45,6 +48,8 @@ class OauthClient
             return cache()->get($this->cacheKey());
         }
 
+        $this->logInfo('Fetching new access token.', ['url' => $this->fromProfile('url')]);
+
         $response = app(Client::class)->post($this->fromProfile('url'), [
             'verify' => $this->fromProfile('verify_https'),
             'json' => [
@@ -62,6 +67,8 @@ class OauthClient
             $body->access_token,
             now()->addSeconds($body->expires_in - $this->cacheDurationSubtraction)
         );
+
+        $this->logInfo('Obtained new access token.', ['url' => $this->fromProfile('url')]);
 
         return cache()->get($this->cacheKey());
     }

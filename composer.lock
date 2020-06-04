@@ -4,8 +4,66 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "36b31261c340fe76a82b1aca76a641a0",
+    "content-hash": "3f6f09297f519a37bbd7abeee5dbe92f",
     "packages": [
+        {
+            "name": "aaronheath/class-logger",
+            "version": "v0.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aaronheath/class-logger.git",
+                "reference": "15bee4af4b54b4859020fd2268fed54dde82ef24"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aaronheath/class-logger/zipball/15bee4af4b54b4859020fd2268fed54dde82ef24",
+                "reference": "15bee4af4b54b4859020fd2268fed54dde82ef24",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "~5.7.0",
+                "php": "^7.2.5"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.0",
+                "orchestra/testbench": "~3.7.0",
+                "phpunit/phpunit": "~7.0",
+                "sempro/phpunit-pretty-print": "^1.0",
+                "timacdonald/log-fake": "^1.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Heath\\ClassLogger\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Aaron Heath",
+                    "email": "aaron@aaronheath.com",
+                    "homepage": "https://aaronheath.com"
+                }
+            ],
+            "description": "Simple logging helper trait for use within Laravel classes.",
+            "keywords": [
+                "laravel",
+                "logging",
+                "logs"
+            ],
+            "support": {
+                "source": "https://github.com/aaronheath/class-logger/tree/v0.0.1",
+                "issues": "https://github.com/aaronheath/class-logger/issues"
+            },
+            "time": "2020-06-04T20:55:51+00:00"
+        },
         {
             "name": "doctrine/inflector",
             "version": "1.4.2",

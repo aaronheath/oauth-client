@@ -2,8 +2,8 @@
 
 namespace Heath\OauthClient;
 
-use GuzzleHttp\Client;
 use Heath\ClassLogger\ClassLogger;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class OauthClient
@@ -50,22 +50,20 @@ class OauthClient
 
         $this->logInfo('Fetching new access token.', ['url' => $this->fromProfile('url')]);
 
-        $response = app(Client::class)->post($this->fromProfile('url'), [
-            'verify' => $this->fromProfile('verify_https'),
-            'json' => [
+        $response = Http::withOptions(['verify' => $this->fromProfile('verify_https')])
+            ->post($this->fromProfile('url'), [
                 'grant_type' => 'client_credentials',
                 'client_id' => $this->fromProfile('client_id'),
                 'client_secret' => $this->fromProfile('client_secret'),
                 'scope' => $this->fromProfile('scope'),
-            ],
-        ]);
+            ]);
 
-        $body = json_decode((string) $response->getBody());
+        $body = $response->json();
 
         cache()->put(
             $this->cacheKey(),
-            $body->access_token,
-            now()->addSeconds($body->expires_in - $this->cacheDurationSubtraction)
+            $body['access_token'],
+            now()->addSeconds($body['expires_in'] - $this->cacheDurationSubtraction)
         );
 
         $this->logInfo('Obtained new access token.', ['url' => $this->fromProfile('url')]);

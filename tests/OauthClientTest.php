@@ -2,14 +2,10 @@
 
 namespace Tests;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
-use GuzzleHttp\Psr7\Response;
 use Heath\OauthClient\OauthClient;
 use Heath\OauthClient\OauthClientException;
 use Heath\OauthClient\OauthClientServiceProvider;
+use Illuminate\Support\Facades\Http;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class OauthClientTest extends Orchestra
@@ -39,41 +35,32 @@ class OauthClientTest extends Orchestra
             'oauth-client.profiles.default.verify_https' => true,
         ]);
 
-        $requests = [];
-
-        $history = Middleware::history($requests);
-
-        $responses = new MockHandler([
-            new Response(200, ['content-type' => 'application/json'], json_encode([
-                'token_type' => 'Bearer',
-                'expires_in' => 3000,
-                'access_token' => 'yyy',
-                'expires_at' => '2019-04-01T00:01:02.001Z',
-            ])),
+        Http::fake([
+            '*' => Http::response(
+                json_encode([
+                    'token_type' => 'Bearer',
+                    'expires_in' => 3000,
+                    'access_token' => 'yyy',
+                    'expires_at' => '2019-04-01T00:01:02.001Z',
+                ]),
+                200,
+                ['content-type' => 'application/json']
+            ),
         ]);
-
-        $handler = HandlerStack::create($responses);
-        $handler->push($history);
-
-        $client = new Client(['handler' => $handler]);
-
-        $this->app->instance(Client::class, $client);
 
         $this->assertEquals('yyy' , (new OauthClient)->token());
         $this->assertEquals('yyy', cache()->get('oauth.default.access_token'));
 
-        $this->assertEquals('POST', $requests[0]['request']->getMethod());
-        $this->assertEquals('https://example.com/oauth/token', $requests[0]['request']->getUri());
-        $this->assertTrue($requests[0]['options']['verify']);
-        $this->assertEquals(
-            json_encode([
-                'grant_type' => 'client_credentials',
-                'client_id' => 'abc123',
-                'client_secret' => 'xyz987',
-                'scope' => '',
-            ]),
-            (string) $requests[0]['request']->getBody()
-        );
+        Http::assertSent(function($request) {
+            return $request->url() == 'https://example.com/oauth/token'
+                && $request->method() == 'POST'
+                && $request->data() == [
+                    'grant_type' => 'client_credentials',
+                    'client_id' => 'abc123',
+                    'client_secret' => 'xyz987',
+                    'scope' => '',
+                ];
+        });
     }
 
     /**
@@ -122,41 +109,32 @@ class OauthClientTest extends Orchestra
             'oauth-client.profiles.testing.scope' => '',
         ]);
 
-        $requests = [];
-
-        $history = Middleware::history($requests);
-
-        $responses = new MockHandler([
-            new Response(200, ['content-type' => 'application/json'], json_encode([
-                'token_type' => 'Bearer',
-                'expires_in' => 3000,
-                'access_token' => 'testing',
-                'expires_at' => '2019-04-01T00:01:02.001Z',
-            ])),
+        Http::fake([
+            '*' => Http::response(
+                json_encode([
+                    'token_type' => 'Bearer',
+                    'expires_in' => 3000,
+                    'access_token' => 'testing',
+                    'expires_at' => '2019-04-01T00:01:02.001Z',
+                ]),
+                200,
+                ['content-type' => 'application/json']
+            ),
         ]);
-
-        $handler = HandlerStack::create($responses);
-        $handler->push($history);
-
-        $client = new Client(['handler' => $handler]);
-
-        $this->app->instance(Client::class, $client);
 
         $this->assertEquals('testing' , (new OauthClient)->useProfile('testing')->token());
         $this->assertEquals('testing', cache()->get('oauth.testing.access_token'));
 
-        $this->assertEquals('POST', $requests[0]['request']->getMethod());
-        $this->assertEquals($url, $requests[0]['request']->getUri());
-        $this->assertFalse($requests[0]['options']['verify']);
-        $this->assertEquals(
-            json_encode([
-                'grant_type' => 'client_credentials',
-                'client_id' => $clientId,
-                'client_secret' => $clientSecret,
-                'scope' => '',
-            ]),
-            (string) $requests[0]['request']->getBody()
-        );
+        Http::assertSent(function($request) use ($url, $clientId, $clientSecret) {
+            return $request->url() == $url
+                && $request->method() == 'POST'
+                && $request->data() == [
+                    'grant_type' => 'client_credentials',
+                    'client_id' => $clientId,
+                    'client_secret' => $clientSecret,
+                    'scope' => '',
+                ];
+        });
     }
 
     /**
@@ -190,40 +168,32 @@ class OauthClientTest extends Orchestra
             'oauth-client.profiles.default.client_secret' => 'xyz987',
         ]);
 
-        $requests = [];
-
-        $history = Middleware::history($requests);
-
-        $responses = new MockHandler([
-            new Response(200, ['content-type' => 'application/json'], json_encode([
-                'token_type' => 'Bearer',
-                'expires_in' => 3000,
-                'access_token' => $token,
-                'expires_at' => '2019-04-01T00:01:02.001Z',
-            ])),
+        Http::fake([
+            '*' => Http::response(
+                json_encode([
+                    'token_type' => 'Bearer',
+                    'expires_in' => 3000,
+                    'access_token' => $token,
+                    'expires_at' => '2019-04-01T00:01:02.001Z',
+                ]),
+                200,
+                ['content-type' => 'application/json']
+            ),
         ]);
-
-        $handler = HandlerStack::create($responses);
-        $handler->push($history);
-
-        $client = new Client(['handler' => $handler]);
-
-        $this->app->instance(Client::class, $client);
 
         $this->assertEquals($withToken , (new OauthClient)->withToken($withoutToken));
         $this->assertEquals($token, cache()->get('oauth.default.access_token'));
 
-        $this->assertEquals('POST', $requests[0]['request']->getMethod());
-        $this->assertEquals('https://example.com/oauth/token', $requests[0]['request']->getUri());
-        $this->assertEquals(
-            json_encode([
-                'grant_type' => 'client_credentials',
-                'client_id' => 'abc123',
-                'client_secret' => 'xyz987',
-                'scope' => '',
-            ]),
-            (string) $requests[0]['request']->getBody()
-        );
+        Http::assertSent(function($request) {
+            return $request->url() == 'https://example.com/oauth/token'
+                && $request->method() == 'POST'
+                && $request->data() == [
+                    'grant_type' => 'client_credentials',
+                    'client_id' => 'abc123',
+                    'client_secret' => 'xyz987',
+                    'scope' => '',
+                ];
+        });
     }
 
     /**
